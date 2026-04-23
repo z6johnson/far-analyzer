@@ -128,9 +128,12 @@ guide can't drift undetected from the corpus.
 
 ## Deploy (Vercel)
 
-- `vercel.json` sets `maxDuration: 300` and `memory: 1024` on the analyze
-  route — per-clause LLM fan-out plus a 30 s per-call timeout means a busy
-  MSA can take a couple of minutes.
+- `maxDuration = 300` is exported from the analyze route segment — per-clause
+  LLM fan-out plus a 30 s per-call timeout means a busy MSA can take a couple
+  of minutes. (Vercel's `vercel.json` `functions` block doesn't accept App
+  Router paths; rely on the segment export instead.)
+- If you need more than the default function memory, raise it in the Vercel
+  project dashboard → Settings → Functions.
 - `next.config.ts` uses `outputFileTracingIncludes` to ensure
   `data/far_rag.jsonl` and `data/travis-guide.json` ship inside the
   serverless bundle.
