@@ -1,0 +1,373 @@
+[
+  {
+    "part": "1",
+    "title": "Federal Acquisition Regulations System",
+    "sections": 58,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "2",
+    "title": "Definitions of Words and Terms",
+    "sections": 3,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "3",
+    "title": "Improper Business Practices and Personal Conflicts of Interest",
+    "sections": 98,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "4",
+    "title": "Administrative and Information Matters",
+    "sections": 118,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "5",
+    "title": "Publicizing Contract Actions",
+    "sections": 34,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "6",
+    "title": "Competition Requirements",
+    "sections": 34,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "7",
+    "title": "Acquisition Planning",
+    "sections": 35,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "8",
+    "title": "Required Sources of Supplies and Services",
+    "sections": 67,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "9",
+    "title": "Contractor Qualifications",
+    "sections": 106,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "10",
+    "title": "Market Research",
+    "sections": 4,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "11",
+    "title": "Describing Agency Needs",
+    "sections": 33,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "12",
+    "title": "Acquisition of Commercial Products and Commercial Services",
+    "sections": 38,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "13",
+    "title": "Simplified Acquisition Procedures",
+    "sections": 49,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "14",
+    "title": "Sealed Bidding",
+    "sections": 81,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "15",
+    "title": "Contracting by Negotiation",
+    "sections": 81,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "16",
+    "title": "Types of Contracts",
+    "sections": 75,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "17",
+    "title": "Special Contracting Methods",
+    "sections": 50,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "18",
+    "title": "Emergency Acquisitions",
+    "sections": 34,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "19",
+    "title": "Small Business Programs",
+    "sections": 126,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "20",
+    "title": "Reserved",
+    "sections": 0,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "21",
+    "title": "Reserved",
+    "sections": 0,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "22",
+    "title": "Application of Labor Laws to Government Acquisitions",
+    "sections": 206,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "23",
+    "title": "Environment, Sustainable Acquisition, and Material Safety",
+    "sections": 38,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "24",
+    "title": "Protection of Privacy and Freedom of Information",
+    "sections": 10,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "25",
+    "title": "Foreign Acquisition",
+    "sections": 81,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "26",
+    "title": "Other Socioeconomic Programs",
+    "sections": 36,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "27",
+    "title": "Patents, Data, and Copyrights",
+    "sections": 59,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "28",
+    "title": "Bonds and Insurance",
+    "sections": 61,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "29",
+    "title": "Taxes",
+    "sections": 23,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "30",
+    "title": "Cost Accounting Standards Administration",
+    "sections": 30,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "31",
+    "title": "Contract Cost Principles and Procedures",
+    "sections": 87,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "32",
+    "title": "Contract Financing",
+    "sections": 175,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "33",
+    "title": "Protests, Disputes, and Appeals",
+    "sections": 23,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "34",
+    "title": "Major System Acquisition",
+    "sections": 20,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "35",
+    "title": "Research and Development Contracting",
+    "sections": 25,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "36",
+    "title": "Construction and Architect-Engineer Contracts",
+    "sections": 81,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "37",
+    "title": "Service Contracting",
+    "sections": 46,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "38",
+    "title": "Federal Supply Schedule Contracting",
+    "sections": 3,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "39",
+    "title": "Acquisition of Information Technology",
+    "sections": 14,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "40",
+    "title": "Information Security and Supply Chain Security",
+    "sections": 11,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "41",
+    "title": "Acquisition of Utility Services",
+    "sections": 17,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "42",
+    "title": "Contract Administration and Audit Services",
+    "sections": 85,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "43",
+    "title": "Contract Modifications",
+    "sections": 14,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "44",
+    "title": "Subcontracting Policies and Procedures",
+    "sections": 24,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "45",
+    "title": "Government Property",
+    "sections": 33,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "46",
+    "title": "Quality Assurance",
+    "sections": 60,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "47",
+    "title": "Transportation",
+    "sections": 106,
+    "clauses": 0,
+    "provisions": 1
+  },
+  {
+    "part": "48",
+    "title": "Value Engineering",
+    "sections": 13,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "49",
+    "title": "Termination of Contracts",
+    "sections": 108,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "50",
+    "title": "Extraordinary Contractual Actions and the SAFETY Act",
+    "sections": 34,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "51",
+    "title": "Use of Government Sources by Contractors",
+    "sections": 15,
+    "clauses": 0,
+    "provisions": 0
+  },
+  {
+    "part": "52",
+    "title": "Solicitation Provisions and Contract Clauses",
+    "sections": 757,
+    "clauses": 489,
+    "provisions": 116
+  },
+  {
+    "part": "53",
+    "title": "Forms",
+    "sections": 77,
+    "clauses": 0,
+    "provisions": 0
+  }
+]
