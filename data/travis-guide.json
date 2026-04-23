@@ -1,0 +1,361 @@
+{
+  "$schema": "./travis-guide.schema.json",
+  "source": "Travis D's FAR Clause Guide — SIO internal",
+  "version": "2026-04-seed",
+  "note": "Initial seed of the most commonly encountered FAR/CAR/DFARS flow-down clauses in SIO sponsor contracts, classified Green / Red / Grey. Extend by adding entries below; the Zod schema and guide-linkage test will catch typos and broken FAR section references.",
+  "entries": [
+    {
+      "section": "52.202-1",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Definitions",
+      "guidance": "Acceptable. Standard definitions clause with no substantive flow-down impact."
+    },
+    {
+      "section": "52.203-3",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Gratuities",
+      "guidance": "Acceptable. Prohibits gratuities to government employees. Standard institutional policy already complies."
+    },
+    {
+      "section": "52.203-5",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Covenant Against Contingent Fees",
+      "guidance": "Acceptable. UC does not use contingent-fee arrangements for federal awards."
+    },
+    {
+      "section": "52.203-7",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Anti-Kickback Procedures",
+      "guidance": "Acceptable. Conforms to UC policy on procurement ethics."
+    },
+    {
+      "section": "52.203-12",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Limitation on Payments to Influence Certain Federal Transactions",
+      "guidance": "Acceptable. UC complies with the Byrd Anti-Lobbying Amendment; appropriated funds are not used for lobbying."
+    },
+    {
+      "section": "52.203-13",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Contractor Code of Business Ethics and Conduct",
+      "guidance": "Conditional. UC has an institutional code of ethics; accept where the contract value + period triggers the clause. Confirm the PI-facing training requirement is scoped to key personnel.",
+      "question_for_pi": "Will any key personnel require additional ethics training beyond UC's standard compliance curriculum?"
+    },
+    {
+      "section": "52.204-21",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Basic Safeguarding of Covered Contractor Information Systems",
+      "guidance": "Conditional. Acceptable only if the project processes, stores, or transmits Federal Contract Information (FCI). Fundamental research without FCI should not trigger this clause; if the sponsor asserts it applies, verify with the PI and ITS.",
+      "question_for_pi": "Will the project handle any non-public information the Government provides or that is generated for the Government under this contract?",
+      "notes": [
+        "Applies only to systems that handle FCI.",
+        "If CUI is involved, NIST 800-171 / 52.204-27 / DFARS 252.204-7012 likely attach and require separate review."
+      ]
+    },
+    {
+      "section": "52.204-23",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Prohibition on Contracting for Hardware, Software, and Services Developed or Provided by Kaspersky Lab",
+      "guidance": "Acceptable. UC does not procure or deploy Kaspersky products on research systems."
+    },
+    {
+      "section": "52.204-25",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Prohibition on Contracting for Certain Telecommunications and Video Surveillance Services or Equipment",
+      "guidance": "Acceptable. UC complies with Section 889. Representation is handled institutionally."
+    },
+    {
+      "section": "52.209-6",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Protecting the Government's Interest When Subcontracting With Contractors Debarred, Suspended, or Proposed for Debarment",
+      "guidance": "Acceptable. Standard SAM.gov exclusion check is performed before subawards."
+    },
+    {
+      "section": "52.212-4",
+      "authority": "FAR",
+      "flag": "red",
+      "title": "Contract Terms and Conditions—Commercial Products and Commercial Services",
+      "guidance": "Remove or replace. 52.212-4 is drafted for commercial-item procurements and carries inspection, warranty, and termination-for-convenience terms that are inappropriate for a cost-reimbursement sponsored-research agreement at a non-profit educational institution.",
+      "suggested_justification": "Scripps is a non-profit educational research institution and cannot accept commercial-item terms (inspection system, warranty of merchantability, unlimited termination-for-convenience liability) for fundamental research. Request deletion or substitution with the appropriate research-agreement terms.",
+      "alt_guidance": [
+        {
+          "alt": "Alternate I",
+          "note": "Time-and-materials / labor-hour variant — also inappropriate for cost-reimbursement research."
+        }
+      ]
+    },
+    {
+      "section": "52.215-2",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Audit and Records—Negotiation",
+      "guidance": "Acceptable. UC complies with federal audit and records retention requirements under 2 CFR 200."
+    },
+    {
+      "section": "52.219-8",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Utilization of Small Business Concerns",
+      "guidance": "Acceptable. UC maintains a small-business utilization program at the institutional level."
+    },
+    {
+      "section": "52.219-9",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Small Business Subcontracting Plan",
+      "guidance": "Conditional. Only applies above the subcontracting-plan threshold; confirm the award amount and whether UC's master small-business plan satisfies the requirement.",
+      "question_for_pi": "What's the total award value, and is subcontracting anticipated above the clause threshold?"
+    },
+    {
+      "section": "52.222-26",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Equal Opportunity",
+      "guidance": "Acceptable. UC complies with EO 11246 and maintains affirmative action programs."
+    },
+    {
+      "section": "52.222-35",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Equal Opportunity for Veterans",
+      "guidance": "Acceptable. UC complies with VEVRAA."
+    },
+    {
+      "section": "52.222-36",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Equal Opportunity for Workers with Disabilities",
+      "guidance": "Acceptable. UC complies with Section 503 of the Rehabilitation Act."
+    },
+    {
+      "section": "52.222-50",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Combating Trafficking in Persons",
+      "guidance": "Acceptable. UC has an institutional anti-trafficking policy and monitoring procedure."
+    },
+    {
+      "section": "52.225-13",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Restrictions on Certain Foreign Purchases",
+      "guidance": "Acceptable. UC does not transact with OFAC-sanctioned entities."
+    },
+    {
+      "section": "52.227-1",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Authorization and Consent",
+      "guidance": "Conditional. Generally acceptable for sponsored research; confirm which Alternate is invoked and that it extends authorization and consent to UC's work.",
+      "alt_guidance": [
+        {
+          "alt": "Alternate I",
+          "note": "Extends authorization and consent to first-tier subcontractors — preferred for research."
+        }
+      ]
+    },
+    {
+      "section": "52.227-3",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Patent Indemnity",
+      "guidance": "Conditional. Patent indemnification flow-downs to a non-profit research institution should be carefully scoped. Request deletion or scope to UC's actual contribution.",
+      "suggested_justification": "As a non-profit educational institution, UC cannot accept open-ended patent indemnification. Request deletion or limit to willful infringement."
+    },
+    {
+      "section": "52.227-11",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Patent Rights—Ownership by the Contractor",
+      "guidance": "Acceptable. This is the Bayh-Dole clause and is the preferred IP framework for UC-performed federally funded research."
+    },
+    {
+      "section": "52.227-14",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Rights in Data—General",
+      "guidance": "Conditional. Basic clause is acceptable; Alternates II–V carry additional restrictions that may conflict with UC's fundamental-research and publication posture.",
+      "alt_guidance": [
+        {
+          "alt": "Alternate II",
+          "note": "Limited rights in privately-financed data — generally acceptable."
+        },
+        {
+          "alt": "Alternate III",
+          "note": "Restricted rights in computer software — review with PI before acceptance."
+        },
+        {
+          "alt": "Alternate IV",
+          "note": "Withholds deliverable data pending agency review — REMOVE. Conflicts with fundamental-research publication rights."
+        },
+        {
+          "alt": "Alternate V",
+          "note": "Copyright assertion restrictions — negotiate."
+        }
+      ],
+      "question_for_pi": "Do you anticipate publishing results without prior agency approval? Which Alternate is invoked?"
+    },
+    {
+      "section": "52.227-17",
+      "authority": "FAR",
+      "flag": "red",
+      "title": "Rights in Data—Special Works",
+      "guidance": "Remove. Gives the Government unlimited rights and can require copyright assignment — incompatible with UC's fundamental-research posture.",
+      "suggested_justification": "Special-works copyright assignment conflicts with UC's authorship and publication policies. Request substitution with 52.227-14 Basic."
+    },
+    {
+      "section": "52.230-2",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Cost Accounting Standards",
+      "guidance": "Conditional. UC is subject to educational-institution CAS under 48 CFR 9905. Confirm the award triggers CAS-covered contract thresholds and that the modified-CAS framework for educational institutions applies rather than the full commercial CAS set.",
+      "notes": [
+        "Educational institutions are generally covered by the modified CAS at 48 CFR 9905, not the full 9904 commercial set."
+      ]
+    },
+    {
+      "section": "52.232-25",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Prompt Payment",
+      "guidance": "Acceptable. Standard payment-terms clause."
+    },
+    {
+      "section": "52.232-39",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Unenforceability of Unauthorized Obligations",
+      "guidance": "Acceptable."
+    },
+    {
+      "section": "52.233-1",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Disputes",
+      "guidance": "Acceptable. Standard Contract Disputes Act clause."
+    },
+    {
+      "section": "52.233-3",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Protest After Award",
+      "guidance": "Acceptable."
+    },
+    {
+      "section": "52.242-15",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Stop-Work Order",
+      "guidance": "Acceptable. Standard Government right to suspend performance."
+    },
+    {
+      "section": "52.243-1",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Changes—Fixed-Price",
+      "guidance": "Acceptable if the contract is fixed-price; confirm contract type before accepting."
+    },
+    {
+      "section": "52.243-2",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Changes—Cost-Reimbursement",
+      "guidance": "Acceptable. Preferred changes clause for cost-reimbursement research."
+    },
+    {
+      "section": "52.244-2",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Subcontracts",
+      "guidance": "Conditional. Confirm which Alternate is invoked; Alternate I requires consent to subcontract that may slow research-driven subaward execution.",
+      "question_for_pi": "Are any subawards anticipated, and at what anticipated value?"
+    },
+    {
+      "section": "52.245-1",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Government Property",
+      "guidance": "Conditional. Acceptable only if government-furnished property is actually contemplated; otherwise request deletion. UC's property management system is approved under UC-wide procedures.",
+      "question_for_pi": "Will the sponsor provide equipment, materials, or other government property?"
+    },
+    {
+      "section": "52.246-23",
+      "authority": "FAR",
+      "flag": "red",
+      "title": "Limitation of Liability",
+      "guidance": "Remove. Limitation-of-liability clauses drafted for commercial supplies do not fit fundamental research and can conflict with UC's risk posture.",
+      "suggested_justification": "UC is a non-profit educational institution performing fundamental research. Request deletion; standard sponsored-research liability terms apply."
+    },
+    {
+      "section": "52.249-2",
+      "authority": "FAR",
+      "flag": "grey",
+      "title": "Termination for Convenience of the Government (Fixed-Price)",
+      "guidance": "Conditional. Acceptable for fixed-price awards; preserve the contractor's right to settlement of allowable costs incurred."
+    },
+    {
+      "section": "52.249-6",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Termination (Cost-Reimbursement)",
+      "guidance": "Acceptable. Preferred termination clause for cost-reimbursement research."
+    },
+    {
+      "section": "52.249-14",
+      "authority": "FAR",
+      "flag": "green",
+      "title": "Excusable Delays",
+      "guidance": "Acceptable. Standard force-majeure framework."
+    },
+    {
+      "section": "1352.209-73",
+      "authority": "CAR",
+      "flag": "red",
+      "title": "Compliance with the Laws",
+      "guidance": "Remove. The Department of Commerce CAR clause requires contractor compliance representations that extend beyond UC's institutional compliance posture.",
+      "suggested_justification": "UC complies with all applicable laws through institutional policy; a contract-specific attestation is duplicative."
+    },
+    {
+      "section": "1352.237-73",
+      "authority": "CAR",
+      "flag": "red",
+      "title": "Foreign National Visitors and Guests",
+      "guidance": "Remove. Imposes visitor-screening obligations incompatible with UC's open-campus fundamental-research environment.",
+      "suggested_justification": "UC operates an open research campus under NSDD-189. Foreign-national visitor screening beyond export-control requirements is not compatible with fundamental research."
+    },
+    {
+      "section": "252.204-7012",
+      "authority": "DFARS",
+      "flag": "red",
+      "title": "Safeguarding Covered Defense Information and Cyber Incident Reporting",
+      "guidance": "Remove unless the project actually handles Covered Defense Information (CDI/CUI). For fundamental research with no CUI, the clause should not attach; if the sponsor asserts it does, request a scope letter and engage ITS and the Export Control Office before accepting.",
+      "suggested_justification": "Fundamental research at Scripps does not generate or handle CDI. If the sponsor confirms CDI will be provided, accepting this clause requires NIST SP 800-171 compliance at the system level — treat as a scope change.",
+      "question_for_pi": "Will the project receive any information marked CUI, CDI, or ITAR from the sponsor?"
+    },
+    {
+      "section": "252.204-7020",
+      "authority": "DFARS",
+      "flag": "grey",
+      "title": "NIST SP 800-171 DoD Assessment Requirements",
+      "guidance": "Conditional. Tied to 252.204-7012. If that clause is removed, this one should be removed too. If 7012 remains, confirm the required DoD assessment is in SPRS for the covered system."
+    },
+    {
+      "section": "252.227-7013",
+      "authority": "DFARS",
+      "flag": "grey",
+      "title": "Rights in Technical Data—Noncommercial Items",
+      "guidance": "Conditional. Acceptable for DoD-funded research provided unlimited rights are scoped to actual deliverables and UC retains publication rights consistent with fundamental research.",
+      "question_for_pi": "What technical data deliverables are contemplated, and will any be developed exclusively at private expense?"
+    }
+  ]
+}
