@@ -110,6 +110,34 @@ Guidance: ${guide.guidance}${guide.suggested_justification ? `\nJustification (i
   return parts.join("\n\n");
 }
 
+/**
+ * Convert an SDK / proxy error into a short, user-safe rationale string.
+ * Strips out provider debug payloads that may include API key prefixes,
+ * token hashes, or stack traces.
+ */
+function formatLlmError(err: unknown): string {
+  const status =
+    typeof err === "object" && err !== null && "status" in err
+      ? (err as { status?: number }).status
+      : undefined;
+  if (status === 401 || status === 403) {
+    return "Authentication failed against the LLM proxy. Verify LITELLM_API_KEY in the Vercel project settings, then redeploy.";
+  }
+  if (status === 429) {
+    return "Rate limited by the LLM proxy. Try again in a moment.";
+  }
+  if (typeof status === "number" && status >= 500) {
+    return `LLM proxy returned ${status}; transient server-side error.`;
+  }
+  if (err instanceof Error && err.name === "AbortError") {
+    return "LLM call timed out (30s).";
+  }
+  const msg = err instanceof Error ? err.message : String(err);
+  // Take the first line and cap length so we never echo provider internals.
+  const firstLine = msg.split(/\r?\n/, 1)[0];
+  return `LLM call failed: ${firstLine.slice(0, 160)}`;
+}
+
 function tryParse(content: string): z.SafeParseReturnType<unknown, LlmClauseResponse> {
   // Strip code fences if the model wrapped the JSON despite the instruction.
   const stripped = content
@@ -221,10 +249,7 @@ export async function analyzeClause(
   try {
     raw = await callOnce();
   } catch (err) {
-    return fallback(
-      "unknown",
-      `LLM call failed: ${err instanceof Error ? err.message : String(err)}`,
-    );
+    return fallback("unknown", formatLlmError(err));
   }
 
   let parsed = tryParse(raw);
@@ -235,10 +260,7 @@ export async function analyzeClause(
       );
       parsed = tryParse(raw);
     } catch (err) {
-      return fallback(
-        "unknown",
-        `LLM call failed on retry: ${err instanceof Error ? err.message : String(err)}`,
-      );
+      return fallback("unknown", formatLlmError(err));
     }
   }
 
