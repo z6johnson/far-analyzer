@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  /* Achromatic scale — neutral-0 is page background, 900 is the darkest ink. */
+  --color-neutral-0: #ffffff;
+  --color-neutral-50: #fafafa;
+  --color-neutral-100: #f4f4f4;
+  --color-neutral-200: #e5e5e5;
+  --color-neutral-300: #d4d4d4;
+  --color-neutral-400: #a3a3a3;
+  --color-neutral-600: #525252;
+  --color-neutral-800: #262626;
+  --color-neutral-900: #0a0a0a;
+
+  /* Semantic flag tokens. Muted; always paired with text + weight. */
+  --color-flag-green-bg: #e8f1ea;
+  --color-flag-green-fg: #1f5130;
+  --color-flag-red-bg: #f4e4e2;
+  --color-flag-red-fg: #7a2418;
+  --color-flag-grey-bg: #ededed;
+  --color-flag-grey-fg: #404040;
+  --color-flag-unknown-bg: #fff4d6;
+  --color-flag-unknown-fg: #6b4a00;
+
+  /* Type system */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue",
+    Arial, sans-serif;
+
+  /* Layout tokens */
+  --spacing-gutter: 2rem;
+}
+
+html,
+body {
+  background: var(--color-neutral-0);
+  color: var(--color-neutral-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: "ss01", "cv11";
+}
+
+.label-caps {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-neutral-600);
+}
+
+.display-tight {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid var(--color-neutral-900);
+  outline-offset: 2px;
+}
