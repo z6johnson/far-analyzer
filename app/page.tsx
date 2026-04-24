@@ -5,7 +5,8 @@ import { Header } from "@/components/Header";
 import { Disclaimer } from "@/components/Disclaimer";
 import { Dropzone } from "@/components/Dropzone";
 import { ResultsTable } from "@/components/ResultsTable";
-import type { AnalyzeEvent, ClauseRow } from "@/lib/schemas";
+import { FlagCountChip } from "@/components/FlagCountChip";
+import type { AnalyzeEvent, ClauseRow, Flag } from "@/lib/schemas";
 
 type Status =
   | { kind: "idle" }
@@ -130,19 +131,27 @@ export default function Page() {
         )}
 
         {status.kind === "done" && (
-          <div className="mb-6 flex items-baseline justify-between border-b border-neutral-200 pb-4">
+          <div className="mb-6 flex items-center justify-between border-b border-neutral-200 pb-4">
             <div>
               <p className="display-tight text-base text-neutral-900">
                 {status.filename}
               </p>
-              <p className="label-caps mt-1">
-                {summarize(status.counts)}
-              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {(["red", "grey", "green", "unknown"] as const)
+                  .filter((k) => (status.counts[k] ?? 0) > 0)
+                  .map((k) => (
+                    <FlagCountChip
+                      key={k}
+                      flag={k as Flag}
+                      count={status.counts[k] ?? 0}
+                    />
+                  ))}
+              </div>
             </div>
             <button
               type="button"
               onClick={reset}
-              className="text-sm text-neutral-600 underline underline-offset-2 hover:text-neutral-900"
+              className="label-caps border border-neutral-900 bg-neutral-0 px-4 py-2 text-neutral-900 transition-colors hover:bg-neutral-900 hover:text-neutral-0"
             >
               Analyze another
             </button>
@@ -193,10 +202,3 @@ export default function Page() {
   );
 }
 
-function summarize(counts: Record<string, number>): string {
-  const order = ["red", "grey", "green", "unknown"] as const;
-  return order
-    .filter((k) => (counts[k] ?? 0) > 0)
-    .map((k) => `${counts[k]} ${k}`)
-    .join(" · ");
-}
