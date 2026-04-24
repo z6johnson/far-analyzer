@@ -55,11 +55,15 @@ Structural records (`type` in `part`, `subpart`) are useful for scope questions 
 ## Regenerating
 
 ```
-git clone --depth 1 https://github.com/GSA/GSA-Acquisition-FAR.git
-python3 build_far_rag.py
+git clone --depth 1 https://github.com/GSA/GSA-Acquisition-FAR.git /tmp/gsa-far
+python3 build_far_rag.py --src /tmp/gsa-far/dita --out .
 ```
 
-The script expects the clone at `/sessions/confident-modest-tesla/GSA-Acquisition-FAR`; adjust `SRC_DIR` at the top of the script if yours lives elsewhere. Run time is under a minute on a laptop.
+`--src` points at the upstream `dita/` directory; `--out` is where `far_rag.jsonl`, `far_index.csv`, and `far_parts.json` are written. Both can also be set via the `FAR_SRC_DIR` and `FAR_OUT_DIR` environment variables.
+
+`--fac-through` stamps a FAC label on every record. When omitted, the script scrapes the label from `Version.dita` / `README.md` / `FARTOC.dita` in the source tree and falls back to the last-known release if nothing plausible is found. Run time is under a minute on a laptop.
+
+Regeneration also happens automatically on a weekly schedule via `.github/workflows/update-far-corpus.yml`, which opens a draft PR whenever the upstream DITA source changes. See the top-level `README.md` for the full pipeline.
 
 ## Known limitations
 

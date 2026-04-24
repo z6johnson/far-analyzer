@@ -1,0 +1,122 @@
+name: Update FAR corpus
+
+# Weekly refresh of the FAR RAG corpus from the upstream GSA DITA source.
+# Clones github.com/GSA/GSA-Acquisition-FAR, rebuilds far_rag.jsonl +
+# far_index.csv + far_parts.json via data/build_far_rag.py, and opens a
+# draft PR when anything changed. Can also be dispatched manually.
+
+on:
+  schedule:
+    # Mondays at 11:00 UTC (~7am ET). GSA typically publishes FACs on a
+    # Thursday/Friday; Monday gives us the weekend to catch them.
+    - cron: "0 11 * * 1"
+  workflow_dispatch:
+    inputs:
+      fac_through:
+        description: "Override FAC label (optional; otherwise auto-detected)."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: update-far-corpus
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Rebuild FAR corpus
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout far-analyzer
+        uses: actions/checkout@v4
+
+      - name: Clone GSA FAR upstream
+        run: |
+          git clone --depth 1 \
+            https://github.com/GSA/GSA-Acquisition-FAR.git \
+            "${RUNNER_TEMP}/gsa-far"
+
+      - name: Capture upstream revision
+        id: upstream
+        working-directory: ${{ runner.temp }}/gsa-far
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "short_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          echo "committed_at=$(git log -1 --format=%cI)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rebuild corpus
+        id: build
+        run: |
+          python3 data/build_far_rag.py \
+            --src "${RUNNER_TEMP}/gsa-far/dita" \
+            --out data \
+            ${FAC_OVERRIDE:+--fac-through "$FAC_OVERRIDE"}
+        env:
+          FAC_OVERRIDE: ${{ inputs.fac_through }}
+
+      - name: Read FAC label from corpus
+        id: fac
+        run: |
+          # The label is stamped on every record; grab it from record 1.
+          FAC=$(python3 -c "import json; print(json.loads(open('data/far_rag.jsonl').readline())['fac_through'])")
+          echo "label=$FAC" >> "$GITHUB_OUTPUT"
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet -- data/far_rag.jsonl data/far_index.csv data/far_parts.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "summary<<EOF"
+              git diff --stat -- data/far_rag.jsonl data/far_index.csv data/far_parts.json
+              echo EOF
+            } >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: No-op summary
+        if: steps.diff.outputs.changed == 'false'
+        run: |
+          echo "No changes — upstream FAR corpus is already in sync (${{ steps.fac.outputs.label }})." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Create pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: bot/far-corpus-refresh
+          delete-branch: true
+          draft: true
+          commit-message: "data: refresh FAR corpus (${{ steps.fac.outputs.label }})"
+          title: "data: refresh FAR corpus (${{ steps.fac.outputs.label }})"
+          labels: |
+            automation
+            far-corpus
+          body: |
+            Automated refresh of the FAR RAG corpus from
+            [GSA/GSA-Acquisition-FAR](https://github.com/GSA/GSA-Acquisition-FAR).
+
+            **FAC through:** `${{ steps.fac.outputs.label }}`
+            **Upstream commit:** `${{ steps.upstream.outputs.short_sha }}` (committed ${{ steps.upstream.outputs.committed_at }})
+            **Trigger:** `${{ github.event_name }}`
+
+            ### File changes
+            ```
+            ${{ steps.diff.outputs.summary }}
+            ```
+
+            ### Review checklist
+            - [ ] `fac_through` on the first record matches the FAC label above.
+            - [ ] `pnpm test` passes (guide-linkage test will fail if a Travis Guide entry references a section that no longer exists in the corpus).
+            - [ ] Spot-check a handful of changed sections against https://www.acquisition.gov/far/.
+
+            Merging this PR rebundles the refreshed corpus into the next
+            Vercel deploy via `outputFileTracingIncludes` in `next.config.ts`.
