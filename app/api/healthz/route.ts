@@ -1,7 +1,5 @@
 import { getModel } from "@/lib/llm/client";
 import { getAnthropicClient } from "@/lib/llm/anthropic-client";
-// LiteLLM probe disabled — see commented-out probeLitellm() below.
-// import { getLlmClient } from "@/lib/llm/client";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -31,20 +29,6 @@ function sanitizeErr(err: unknown): ProbeResult {
   }
   return { ok: false, status: status ?? null, detail };
 }
-
-// async function probeLitellm(model: string): Promise<ProbeResult> {
-//   try {
-//     const client = getLlmClient();
-//     const resp = await client.chat.completions.create({
-//       model,
-//       max_tokens: 5,
-//       messages: [{ role: "user", content: "ping" }],
-//     });
-//     return { ok: true, model: resp.model };
-//   } catch (err) {
-//     return sanitizeErr(err);
-//   }
-// }
 
 async function probeAnthropic(model: string): Promise<ProbeResult> {
   const client = getAnthropicClient();
