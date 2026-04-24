@@ -1,23 +1,78 @@
 import { getLlmClient, getModel } from "@/lib/llm/client";
+import { getAnthropicClient } from "@/lib/llm/anthropic-client";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
+type ProbeResult = {
+  ok: boolean;
+  status?: number | null;
+  detail?: string;
+  model?: string;
+};
+
+function sanitizeErr(err: unknown): ProbeResult {
+  const status =
+    typeof err === "object" && err !== null && "status" in err
+      ? (err as { status?: number }).status
+      : undefined;
+  let detail: string;
+  if (status === 401 || status === 403) {
+    detail = "Auth rejected. Key reaches the service but isn't recognized.";
+  } else if (status === 429) {
+    detail = "Rate limited.";
+  } else if (typeof status === "number" && status >= 500) {
+    detail = `Service returned ${status}.`;
+  } else {
+    const msg = err instanceof Error ? err.message : String(err);
+    detail = msg.split(/\r?\n/, 1)[0].slice(0, 160);
+  }
+  return { ok: false, status: status ?? null, detail };
+}
+
+async function probeLitellm(model: string): Promise<ProbeResult> {
+  try {
+    const client = getLlmClient();
+    const resp = await client.chat.completions.create({
+      model,
+      max_tokens: 5,
+      messages: [{ role: "user", content: "ping" }],
+    });
+    return { ok: true, model: resp.model };
+  } catch (err) {
+    return sanitizeErr(err);
+  }
+}
+
+async function probeAnthropic(model: string): Promise<ProbeResult> {
+  const client = getAnthropicClient();
+  if (!client) {
+    return { ok: false, detail: "ANTHROPIC_API_KEY not set — fallback disabled." };
+  }
+  try {
+    const resp = await client.messages.create({
+      model,
+      max_tokens: 5,
+      messages: [{ role: "user", content: "ping" }],
+    });
+    return { ok: true, model: resp.model };
+  } catch (err) {
+    return sanitizeErr(err);
+  }
+}
+
 /**
- * GET /api/healthz — one-shot ping against the LiteLLM proxy.
- *
- * Reports whether env vars are present and whether the configured model
- * responds to a 5-token "ping" request. Returns status codes only — never
- * echoes the API key or provider debug payloads. Useful for diagnosing
- * "why does every row fail?" from the deployed environment without
- * uploading a PDF.
+ * GET /api/healthz — probes both LLM paths and reports status. Useful for
+ * diagnosing "why does every row fail?" from the deployed URL without
+ * uploading a PDF. Never echoes the API key or provider debug payloads.
  */
 export async function GET() {
   const env = {
     LITELLM_API_KEY: Boolean(process.env.LITELLM_API_KEY?.trim()),
     LITELLM_BASE_URL: Boolean(process.env.LITELLM_BASE_URL?.trim()),
+    ANTHROPIC_API_KEY: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
     ANTHROPIC_MODEL: Boolean(process.env.ANTHROPIC_MODEL?.trim()),
-    base_url_host: process.env.LITELLM_BASE_URL?.trim()
+    litellm_base_url_host: process.env.LITELLM_BASE_URL?.trim()
       ? (() => {
           try {
             return new URL(process.env.LITELLM_BASE_URL!.trim()).host;
@@ -28,61 +83,34 @@ export async function GET() {
       : null,
   };
 
-  if (!env.LITELLM_API_KEY || !env.LITELLM_BASE_URL || !env.ANTHROPIC_MODEL) {
+  if (!env.ANTHROPIC_MODEL) {
     return Response.json(
-      { ok: false, stage: "env", env, detail: "Missing one or more env vars." },
+      { ok: false, env, detail: "ANTHROPIC_MODEL is required." },
       { status: 500 },
     );
   }
 
-  let client;
+  let model: string;
   try {
-    client = getLlmClient();
+    model = getModel();
   } catch (err) {
     return Response.json(
-      {
-        ok: false,
-        stage: "client",
-        env,
-        detail: err instanceof Error ? err.message : "client init failed",
-      },
+      { ok: false, env, detail: err instanceof Error ? err.message : "model" },
       { status: 500 },
     );
   }
 
-  try {
-    const resp = await client.chat.completions.create({
-      model: getModel(),
-      max_tokens: 5,
-      messages: [{ role: "user", content: "ping" }],
-    });
-    return Response.json({
-      ok: true,
-      stage: "llm",
-      env,
-      model: resp.model,
-      response_id: resp.id,
-    });
-  } catch (err) {
-    const status =
-      typeof err === "object" && err !== null && "status" in err
-        ? (err as { status?: number }).status
-        : undefined;
-    let detail: string;
-    if (status === 401 || status === 403) {
-      detail =
-        "Auth rejected by the LLM proxy. The key is reaching the proxy but the proxy's token registry doesn't recognize it.";
-    } else if (status === 429) {
-      detail = "Rate limited by the LLM proxy.";
-    } else if (typeof status === "number" && status >= 500) {
-      detail = `LLM proxy returned ${status}.`;
-    } else {
-      const msg = err instanceof Error ? err.message : String(err);
-      detail = msg.split(/\r?\n/, 1)[0].slice(0, 160);
-    }
-    return Response.json(
-      { ok: false, stage: "llm", env, status: status ?? null, detail },
-      { status: 502 },
-    );
-  }
+  const litellm = env.LITELLM_API_KEY && env.LITELLM_BASE_URL
+    ? await probeLitellm(model)
+    : { ok: false, detail: "LiteLLM env vars not set." };
+
+  const anthropic = env.ANTHROPIC_API_KEY
+    ? await probeAnthropic(model)
+    : { ok: false, detail: "Anthropic fallback not configured." };
+
+  const overall = litellm.ok || anthropic.ok;
+  return Response.json(
+    { ok: overall, env, litellm, anthropic },
+    { status: overall ? 200 : 502 },
+  );
 }

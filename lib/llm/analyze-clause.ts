@@ -8,7 +8,7 @@ import {
   type Flag,
   type SourceLink,
 } from "../schemas";
-import { getLlmClient, getModel } from "./client";
+import { callLlm } from "./call";
 
 const CLAUSE_HEAD = 6_000;
 const CLAUSE_TAIL = 1_000;
@@ -221,29 +221,15 @@ export async function analyzeClause(
     sow: input.sow,
   });
 
-  const client = getLlmClient();
-  const model = getModel();
-
-  const callOnce = async (extraSystem?: string) => {
-    const resp = await client.chat.completions.create(
-      {
-        model,
-        max_tokens: 1_500,
-        temperature: 0,
-        messages: [
-          {
-            role: "system",
-            content: extraSystem
-              ? `${SYSTEM_PROMPT}\n\n${extraSystem}`
-              : SYSTEM_PROMPT,
-          },
-          { role: "user", content: userPrompt },
-        ],
-      },
-      { signal },
-    );
-    return resp.choices[0]?.message?.content ?? "";
-  };
+  const callOnce = async (extraSystem?: string) =>
+    (
+      await callLlm({
+        system: extraSystem ? `${SYSTEM_PROMPT}\n\n${extraSystem}` : SYSTEM_PROMPT,
+        user: userPrompt,
+        maxTokens: 1_500,
+        signal,
+      })
+    ).text;
 
   let raw: string;
   try {
