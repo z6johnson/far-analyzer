@@ -1,5 +1,7 @@
-import { getLlmClient, getModel } from "@/lib/llm/client";
+import { getModel } from "@/lib/llm/client";
 import { getAnthropicClient } from "@/lib/llm/anthropic-client";
+// LiteLLM probe disabled — see commented-out probeLitellm() below.
+// import { getLlmClient } from "@/lib/llm/client";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -30,24 +32,24 @@ function sanitizeErr(err: unknown): ProbeResult {
   return { ok: false, status: status ?? null, detail };
 }
 
-async function probeLitellm(model: string): Promise<ProbeResult> {
-  try {
-    const client = getLlmClient();
-    const resp = await client.chat.completions.create({
-      model,
-      max_tokens: 5,
-      messages: [{ role: "user", content: "ping" }],
-    });
-    return { ok: true, model: resp.model };
-  } catch (err) {
-    return sanitizeErr(err);
-  }
-}
+// async function probeLitellm(model: string): Promise<ProbeResult> {
+//   try {
+//     const client = getLlmClient();
+//     const resp = await client.chat.completions.create({
+//       model,
+//       max_tokens: 5,
+//       messages: [{ role: "user", content: "ping" }],
+//     });
+//     return { ok: true, model: resp.model };
+//   } catch (err) {
+//     return sanitizeErr(err);
+//   }
+// }
 
 async function probeAnthropic(model: string): Promise<ProbeResult> {
   const client = getAnthropicClient();
   if (!client) {
-    return { ok: false, detail: "ANTHROPIC_API_KEY not set — fallback disabled." };
+    return { ok: false, detail: "ANTHROPIC_API_KEY not set." };
   }
   try {
     const resp = await client.messages.create({
@@ -62,25 +64,14 @@ async function probeAnthropic(model: string): Promise<ProbeResult> {
 }
 
 /**
- * GET /api/healthz — probes both LLM paths and reports status. Useful for
+ * GET /api/healthz — probes the Anthropic API and reports status. Useful for
  * diagnosing "why does every row fail?" from the deployed URL without
  * uploading a PDF. Never echoes the API key or provider debug payloads.
  */
 export async function GET() {
   const env = {
-    LITELLM_API_KEY: Boolean(process.env.LITELLM_API_KEY?.trim()),
-    LITELLM_BASE_URL: Boolean(process.env.LITELLM_BASE_URL?.trim()),
     ANTHROPIC_API_KEY: Boolean(process.env.ANTHROPIC_API_KEY?.trim()),
     ANTHROPIC_MODEL: Boolean(process.env.ANTHROPIC_MODEL?.trim()),
-    litellm_base_url_host: process.env.LITELLM_BASE_URL?.trim()
-      ? (() => {
-          try {
-            return new URL(process.env.LITELLM_BASE_URL!.trim()).host;
-          } catch {
-            return "invalid";
-          }
-        })()
-      : null,
   };
 
   if (!env.ANTHROPIC_MODEL) {
@@ -100,17 +91,12 @@ export async function GET() {
     );
   }
 
-  const litellm = env.LITELLM_API_KEY && env.LITELLM_BASE_URL
-    ? await probeLitellm(model)
-    : { ok: false, detail: "LiteLLM env vars not set." };
-
   const anthropic = env.ANTHROPIC_API_KEY
     ? await probeAnthropic(model)
-    : { ok: false, detail: "Anthropic fallback not configured." };
+    : { ok: false, detail: "ANTHROPIC_API_KEY is not set." };
 
-  const overall = litellm.ok || anthropic.ok;
   return Response.json(
-    { ok: overall, env, litellm, anthropic },
-    { status: overall ? 200 : 502 },
+    { ok: anthropic.ok, env, anthropic },
+    { status: anthropic.ok ? 200 : 502 },
   );
 }
