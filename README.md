@@ -76,9 +76,86 @@ data/
   far_rag.jsonl                 # FAR corpus (FAC 2025-06)
   travis-guide.json             # internal Green/Red/Grey guide
   build_far_rag.py              # corpus regeneration script
+.github/workflows/
+  update-far-corpus.yml         # weekly auto-refresh of the corpus
 tests/
   *.test.ts
 ```
+
+## Keeping the FAR corpus current
+
+The FAR is amended by Federal Acquisition Circulars (FACs). GSA maintains
+the authoritative DITA XML at
+[GSA/GSA-Acquisition-FAR](https://github.com/GSA/GSA-Acquisition-FAR);
+everything in `data/far_rag.jsonl` is derived from that upstream. To keep
+the bundled corpus in sync, `.github/workflows/update-far-corpus.yml`
+runs the full regeneration pipeline on a schedule and opens a draft PR
+whenever the upstream changes.
+
+### Pipeline
+
+1. **Schedule** — the workflow runs Mondays at 11:00 UTC (cron
+   `0 11 * * 1`). Dispatch it manually from the Actions tab any time; an
+   optional `fac_through` input overrides the auto-detected label.
+2. **Clone upstream** — shallow clone of
+   `https://github.com/GSA/GSA-Acquisition-FAR` into the runner's tempdir
+   and capture the commit SHA + commit date for the PR description.
+3. **Rebuild corpus** — `python3 data/build_far_rag.py --src <clone>/dita
+   --out data` regenerates `far_rag.jsonl`, `far_index.csv`, and
+   `far_parts.json` in place. The script accepts `--fac-through` (or
+   `FAR_FAC_THROUGH` env var) but, if omitted, scrapes the active FAC
+   label from `Version.dita` / `README.md` / `FARTOC.dita` in the source
+   tree and falls back to the last-known value.
+4. **Diff** — `git diff` against the three data files decides whether
+   anything actually changed. If they're byte-identical the workflow
+   writes a short "in sync" summary and exits.
+5. **Open draft PR** — when changes exist,
+   `peter-evans/create-pull-request@v7` pushes them to
+   `bot/far-corpus-refresh` and opens a draft PR titled
+   `data: refresh FAR corpus (<FAC label>)`. The body includes the FAC
+   label, upstream commit, trigger, `git diff --stat`, and a reviewer
+   checklist. Labels: `automation`, `far-corpus`.
+6. **Merge → deploy** — the PR goes through the normal review path. CI
+   runs `pnpm test`; `tests/guide-linkage.test.ts` will fail if a Travis
+   Guide entry now references a section that no longer exists in the
+   refreshed corpus, so silent drift is impossible. Merging to `main`
+   rebundles the corpus into the next Vercel deploy (the data files are
+   shipped into the serverless bundle via `outputFileTracingIncludes`
+   in `next.config.ts`).
+
+### Running the refresh locally
+
+```bash
+git clone --depth 1 https://github.com/GSA/GSA-Acquisition-FAR.git /tmp/gsa-far
+python3 data/build_far_rag.py --src /tmp/gsa-far/dita --out data
+pnpm test
+git diff data/
+```
+
+Commit the resulting diff and open a PR the same way the workflow would.
+
+### Required repo settings
+
+- **Actions permissions** — Settings → Actions → General → Workflow
+  permissions must allow "Read and write permissions" and "Allow GitHub
+  Actions to create and approve pull requests." Without these the
+  scheduled job cannot open the PR.
+- No secrets are required; the workflow only reads a public GSA repo and
+  writes to its own default `GITHUB_TOKEN`.
+
+### Design notes
+
+- We keep the corpus **committed to the repo** rather than in an
+  external store. The corpus is ~7.7 MB, retrieval is exact-section
+  lookup (not semantic), and every FAC is a reviewable, auditable diff —
+  the tradeoff is that a FAC update is coupled to a redeploy, which for
+  a regulation that changes a few times a year is a feature, not a bug.
+- The PR is opened as a **draft** so a human explicitly accepts the
+  new FAC before it ships.
+- The workflow is idempotent: re-running it with no upstream changes
+  is a no-op, and re-running with the same upstream overwrites the PR
+  branch cleanly (`delete-branch: true`).
+
 
 ## How it works
 

@@ -12,6 +12,7 @@ acquisition.gov URL.
 
 from __future__ import annotations
 
+import argparse
 import csv
 import json
 import os
@@ -20,11 +21,38 @@ import sys
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
-SRC_DIR = Path("/sessions/confident-modest-tesla/GSA-Acquisition-FAR/dita")
-OUT_DIR = Path("/sessions/confident-modest-tesla/mnt/tools/far_clause_analyzer/rag")
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+DEFAULT_FAC_THROUGH = "FAC 2025-06 (effective Oct 1, 2025)"
 
-FAC_THROUGH = "FAC 2025-06 (effective Oct 1, 2025)"
+# Populated by main() from CLI arguments so the helpers below can read
+# the active FAC label without threading it through every call.
+FAC_THROUGH = DEFAULT_FAC_THROUGH
+
+
+def detect_fac_through(src_dir: Path) -> str | None:
+    """Best-effort scrape of the upstream FAC version label.
+
+    The GSA DITA source carries the active FAC in a handful of places
+    depending on the release (Version.dita, README.md at the repo root,
+    or a banner in FARTOC.dita). We probe the likely locations and
+    return the first plausible "FAC YYYY-NN ..." string we find."""
+    candidates = [
+        src_dir / "Version.dita",
+        src_dir.parent / "Version.dita",
+        src_dir.parent / "README.md",
+        src_dir / "FARTOC.dita",
+    ]
+    pattern = re.compile(r"FAC\s*\d{4}-\d{2}[^\"<\n]*", re.IGNORECASE)
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except OSError:
+            continue
+        m = pattern.search(text)
+        if m:
+            return m.group(0).strip().rstrip(".,;) ")
+    return None
 
 # A section filename looks like: "1.101.dita", "52.204-21.dita",
 # "1.102-2.dita", "52.000.dita". Parts/Subparts/Volumes have their
@@ -280,9 +308,57 @@ def parse_part_file(path: Path) -> dict | None:
     }
 
 
-def main() -> None:
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    here = Path(__file__).resolve().parent
+    parser = argparse.ArgumentParser(
+        description="Build the FAR RAG corpus from the GSA DITA XML source.",
+    )
+    parser.add_argument(
+        "--src",
+        type=Path,
+        default=Path(os.environ.get("FAR_SRC_DIR", "./GSA-Acquisition-FAR/dita")),
+        help="Path to the upstream GSA-Acquisition-FAR/dita directory.",
+    )
+    parser.add_argument(
+        "--out",
+        type=Path,
+        default=Path(os.environ.get("FAR_OUT_DIR", str(here))),
+        help="Directory to write far_rag.jsonl, far_index.csv, far_parts.json.",
+    )
+    parser.add_argument(
+        "--fac-through",
+        default=os.environ.get("FAR_FAC_THROUGH"),
+        help=(
+            "FAC version label to stamp on every record. "
+            "If omitted, the script tries to scrape it from the source tree "
+            "and falls back to the last-known release."
+        ),
+    )
+    return parser.parse_args(argv)
+
+
+def main(argv: list[str] | None = None) -> None:
+    global FAC_THROUGH
+    args = parse_args(argv)
+
+    src_dir: Path = args.src
+    out_dir: Path = args.out
+
+    if not src_dir.is_dir():
+        print(f"error: --src {src_dir} is not a directory", file=sys.stderr)
+        sys.exit(2)
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    FAC_THROUGH = (
+        args.fac_through
+        or detect_fac_through(src_dir)
+        or DEFAULT_FAC_THROUGH
+    )
+    print(f"FAC through: {FAC_THROUGH}", file=sys.stderr)
+
     records: list[dict] = []
-    sec_files = sorted(SRC_DIR.glob("*.dita"))
+    sec_files = sorted(src_dir.glob("*.dita"))
     for path in sec_files:
         name = path.name
         rec = None
@@ -321,7 +397,7 @@ def main() -> None:
     # parent-section container records (e.g. 3.101 where only the
     # children 3.101-1, 3.101-2 hold real text) so retrieval doesn't
     # surface empty hits.
-    jsonl_path = OUT_DIR / "far_rag.jsonl"
+    jsonl_path = out_dir / "far_rag.jsonl"
     skipped_empty = 0
     with jsonl_path.open("w", encoding="utf-8") as f:
         for r in records:
@@ -331,7 +407,7 @@ def main() -> None:
             f.write(json.dumps(r, ensure_ascii=False) + "\n")
 
     # Write CSV index (no body text, for quick lookup)
-    csv_path = OUT_DIR / "far_index.csv"
+    csv_path = out_dir / "far_index.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
         w.writerow([
@@ -361,7 +437,7 @@ def main() -> None:
             parts[p]["sections"] += 1
         elif r["type"] == "section":
             parts[p]["sections"] += 1
-    parts_path = OUT_DIR / "far_parts.json"
+    parts_path = out_dir / "far_parts.json"
     with parts_path.open("w", encoding="utf-8") as f:
         json.dump(sorted(parts.values(), key=lambda x: int(x["part"]) if x["part"].isdigit() else 999), f, indent=2)
 
