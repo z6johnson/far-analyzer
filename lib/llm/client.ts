@@ -1,6 +1,8 @@
-import OpenAI from "openai";
+// LiteLLM proxy client disabled — the app currently calls Anthropic directly.
+// Restore the OpenAI import and getLlmClient() below to re-enable.
+// import OpenAI from "openai";
 
-let cached: OpenAI | null = null;
+// let cached: OpenAI | null = null;
 
 /**
  * Strip leading/trailing whitespace from env vars. Pasted secrets
@@ -14,19 +16,18 @@ function clean(v: string | undefined): string | undefined {
   return t.length > 0 ? t : undefined;
 }
 
-export function getLlmClient(): OpenAI {
-  if (cached) return cached;
-  const apiKey = clean(process.env.LITELLM_API_KEY);
-  // Drop trailing slashes to avoid double-slash when the SDK appends /chat/completions.
-  const baseURL = clean(process.env.LITELLM_BASE_URL)?.replace(/\/+$/, "");
-  if (!apiKey || !baseURL) {
-    throw new Error(
-      "LITELLM_API_KEY and LITELLM_BASE_URL must be set for the analyze route.",
-    );
-  }
-  cached = new OpenAI({ apiKey, baseURL });
-  return cached;
-}
+// export function getLlmClient(): OpenAI {
+//   if (cached) return cached;
+//   const apiKey = clean(process.env.LITELLM_API_KEY);
+//   const baseURL = clean(process.env.LITELLM_BASE_URL)?.replace(/\/+$/, "");
+//   if (!apiKey || !baseURL) {
+//     throw new Error(
+//       "LITELLM_API_KEY and LITELLM_BASE_URL must be set for the analyze route.",
+//     );
+//   }
+//   cached = new OpenAI({ apiKey, baseURL });
+//   return cached;
+// }
 
 export function getModel(): string {
   const model = clean(process.env.ANTHROPIC_MODEL);
