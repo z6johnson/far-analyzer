@@ -10,9 +10,8 @@ function clean(v: string | undefined): string | undefined {
 
 /**
  * Returns a direct Anthropic API client if ANTHROPIC_API_KEY is set, otherwise
- * null. Pinned to api.anthropic.com so a stray ANTHROPIC_BASE_URL env var (left
- * over from LiteLLM-style config) can't accidentally route the fallback back
- * through the same broken proxy.
+ * null. Pinned to api.anthropic.com so a stray ANTHROPIC_BASE_URL env var
+ * can't accidentally route requests through a proxy.
  */
 export function getAnthropicClient(): Anthropic | null {
   if (cached) return cached;
@@ -25,6 +24,6 @@ export function getAnthropicClient(): Anthropic | null {
   return cached;
 }
 
-export function hasAnthropicFallback(): boolean {
+export function hasAnthropicKey(): boolean {
   return Boolean(clean(process.env.ANTHROPIC_API_KEY));
 }
