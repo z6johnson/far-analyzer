@@ -8,7 +8,7 @@ export function Header() {
           </h1>
           <p className="label-caps mt-2">MSA Review · Beta</p>
         </div>
-        <p className="label-caps">SIO · UC San Diego</p>
+        <p className="label-caps">UC San Diego</p>
       </div>
     </header>
   );
