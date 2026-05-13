@@ -23,8 +23,9 @@ wherever the answer came from the LLM rather than the bundled corpus.
 
 Next.js 15 App Router with TypeScript, Tailwind v4 for styling, `unpdf` for PDF
 extraction (chosen because it works inside Vercel's serverless runtime), the
-Anthropic SDK for LLM calls, Zod for response validation, and Vitest for tests.
-No database, no telemetry, no analytics. PDFs are never persisted.
+OpenAI SDK pointed at a LiteLLM proxy for LLM calls, Zod for response
+validation, and Vitest for tests. No database, no telemetry, no analytics.
+PDFs are never persisted.
 
 ### The pipeline
 
@@ -136,10 +137,10 @@ needed.
 
 You need three things before deploying:
 
-1. An Anthropic API key, billed to the right cost center. Decide whether this
-   is on a UCSD billing relationship or a personal/pilot account; for
-   production use by Scripps contracting, get it onto an institutional
-   account.
+1. A LiteLLM proxy key (`LITELLM_API_KEY`) and base URL (`LITELLM_BASE_URL`),
+   billed to the right cost center. For Scripps this is the Triton AI proxy
+   at `https://tritonai-api.ucsd.edu`. Get the key issued to the institutional
+   account that should bear LLM costs.
 2. A Vercel account (free tier works for pilot; team plan if multiple people
    will manage deployments).
 3. Decision on access control. The codebase ships without authentication. For
@@ -158,7 +159,8 @@ cp .env.example .env.local
 ```
 
 Edit `.env.local` to set `ANTHROPIC_MODEL=claude-opus-4-7` (or whichever model
-you're standardizing on) and `ANTHROPIC_API_KEY=sk-ant-...`.
+you're standardizing on), `LITELLM_API_KEY=...`, and
+`LITELLM_BASE_URL=https://tritonai-api.ucsd.edu`.
 
 ```bash
 pnpm test    # confirms regex extraction, corpus loading, guide linkage
@@ -175,17 +177,18 @@ From the project root, with the Vercel CLI installed:
 ```bash
 vercel link        # connect this directory to a Vercel project
 vercel env add ANTHROPIC_MODEL production
-vercel env add ANTHROPIC_API_KEY production
+vercel env add LITELLM_API_KEY production
+vercel env add LITELLM_BASE_URL production
 vercel --prod
 ```
 
 Or, more typically, push the repo to GitHub and connect it from the Vercel
-dashboard: New Project → Import Git Repository → set the two environment
+dashboard: New Project → Import Git Repository → set the three environment
 variables in Settings → Environment Variables → Deploy.
 
 Once deployed, hit `https://your-deployment.vercel.app/api/healthz` to confirm
-the Anthropic API is reachable. The endpoint returns `{ ok: true, env,
-anthropic }` if the key works, or a sanitized error if it doesn't. It never
+the LiteLLM proxy is reachable. The endpoint returns `{ ok: true, env,
+litellm }` if the key works, or a sanitized error if it doesn't. It never
 echoes the key itself.
 
 ### Settings to check on the Vercel project
@@ -234,11 +237,10 @@ named individuals.
   rebuild via `data/build_far_rag.py`. The guide-linkage test will catch
   removed sections; new sections just won't have guide entries until someone
   adds them.
-- **Cost monitoring.** Each clause is one Anthropic call. A typical MSA with
+- **Cost monitoring.** Each clause is one LiteLLM call. A typical MSA with
   30 clauses is 30 calls, plus one SoW extraction call if the heuristic
-  missed. Set a billing alert on the Anthropic account. The system prompt is
-  cache-eligible (`cache_control: { type: "ephemeral" }` is already set),
-  which will save substantially once the cache warms.
+  missed. Set a billing alert on the LiteLLM/Triton AI account that owns the
+  key.
 - **Disclaimer language.** The current "Decision-support aid. Contracting
   officer judgment governs" is a deliberately plain statement. Before broader
   rollout, run it past whoever owns risk and compliance posture for SIO

@@ -121,13 +121,13 @@ function formatLlmError(err: unknown): string {
       ? (err as { status?: number }).status
       : undefined;
   if (status === 401 || status === 403) {
-    return "Authentication failed against the Anthropic API. Verify ANTHROPIC_API_KEY in the Vercel project settings, then redeploy.";
+    return "Authentication failed against the LiteLLM proxy. Verify LITELLM_API_KEY in the Vercel project settings, then redeploy.";
   }
   if (status === 429) {
-    return "Rate limited by the Anthropic API. Try again in a moment.";
+    return "Rate limited by the LiteLLM proxy. Try again in a moment.";
   }
   if (typeof status === "number" && status >= 500) {
-    return `Anthropic API returned ${status}; transient server-side error.`;
+    return `LiteLLM proxy returned ${status}; transient server-side error.`;
   }
   if (err instanceof Error && err.name === "AbortError") {
     return "LLM call timed out (30s).";
