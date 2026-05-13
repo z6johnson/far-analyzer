@@ -101,7 +101,7 @@ export default function Page() {
       <Header />
       <Disclaimer />
 
-      <div className="mx-auto max-w-6xl px-8 py-10">
+      <div className="mx-auto max-w-[90%] px-8 py-10">
         {status.kind === "idle" && <Dropzone onFile={handleFile} />}
 
         {status.kind === "uploading" && (
