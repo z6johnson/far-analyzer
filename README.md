@@ -33,17 +33,12 @@ Open http://localhost:3000 and drop a contract PDF.
 
 | Var | Required? | Purpose |
 | --- | --- | --- |
-| `ANTHROPIC_MODEL` | yes | Model id shared by both LLM paths (e.g. `claude-sonnet-4-6`, `claude-opus-4-7`). |
-| `LITELLM_API_KEY` | one of these pairs | Auth for the LiteLLM proxy (Triton AI). |
-| `LITELLM_BASE_URL` | one of these pairs | LiteLLM proxy URL (e.g. `https://tritonai-api.ucsd.edu`). |
-| `ANTHROPIC_API_KEY` | recommended | Direct Anthropic API key (`sk-ant-...`) used as fallback. |
+| `ANTHROPIC_MODEL` | yes | Model id sent to the proxy (e.g. `claude-sonnet-4-6`, `claude-opus-4-7`). |
+| `LITELLM_API_KEY` | yes | Auth for the LiteLLM proxy (Triton AI). |
+| `LITELLM_BASE_URL` | yes | LiteLLM proxy URL (e.g. `https://tritonai-api.ucsd.edu`). |
 
-At least one credential path must be configured. LiteLLM is tried first; on
-auth / 5xx / 429 / network errors the call falls back to the direct Anthropic
-API if `ANTHROPIC_API_KEY` is set. Setting both lets you ride out LiteLLM
-outages or key-rotation churn without losing functionality.
-
-Use `/api/healthz` on the deployed URL to probe both paths.
+All LLM traffic flows through the LiteLLM proxy via the OpenAI SDK. Use
+`/api/healthz` on the deployed URL to probe the proxy.
 
 ## Tests
 
